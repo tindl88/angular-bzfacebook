@@ -1,0 +1,8 @@
+{
+  "name": "angular-bzfacebook",
+  "version": "1.0.4",
+  "main": "./angular-bzfacebook.js",
+  "ignore": [],
+  "dependencies": {
+  }
+}
