@@ -115,6 +115,18 @@
 				return deferred.promise;
 			};
 
+			facebook.logout = function(){
+				var deferred = $q.defer();
+
+				facebook.promise.then(function(){
+					FB.logout(function(response) {
+						deferred.resolve(response);
+					});
+				});
+
+				return deferred.promise;
+			};
+
 			facebook.ui = function(options){
 				var deferred = $q.defer();
 
