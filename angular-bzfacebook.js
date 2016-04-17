@@ -118,10 +118,15 @@
 			facebook.logout = function(){
 				var deferred = $q.defer();
 
-				facebook.promise.then(function(){
-					FB.logout(function(response) {
-						deferred.resolve(response);
-					});
+				facebook.getLoginStatus()
+				.then(function(resp){
+					if(resp.status === 'connected'){
+						FB.logout(function(response) {
+							deferred.resolve(response);
+						});
+					} else {
+						deferred.resolve(resp);
+					}
 				});
 
 				return deferred.promise;
@@ -130,8 +135,9 @@
 			facebook.ui = function(options){
 				var deferred = $q.defer();
 
-				options.method = options.method || 'feed';
-				options.href = options.href || '';
+				options = extend({
+					method: 'share'
+				}, options);
 
 				facebook.promise.then(function(){
 					FB.ui(options, function(response){
@@ -149,9 +155,11 @@
 			facebook.api = function(options){
 				var deferred = $q.defer();
 
-				options.link = options.link || '/me/feed';
-				options.method = options.method || 'get';
-				options.params = options.params || {};
+				options = extend({
+					method: 'get',
+					link: '/me/feed',
+					params: {}
+				}, options);
 
 				facebook.promise.then(function(){
 					FB.api(options.link, options.method, options.params, function(response) {
@@ -212,5 +220,14 @@
 		$window.fbAsyncInit = function() {
 			$facebook.init();
 		};
+	}
+
+	function extend(a, b){
+		for(var key in b){
+			if(b.hasOwnProperty(key)){
+				a[key] = b[key];
+			}
+		}
+		return a;
 	}
 })();
