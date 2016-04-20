@@ -219,6 +219,7 @@
 	function run($window, $facebook){
 		$window.fbAsyncInit = function() {
 			$facebook.init();
+			$facebook.getLoginStatus();
 		};
 	}
 
