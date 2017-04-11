@@ -1,0 +1,19 @@
+{
+  "name": "angular-bzfacebook",
+  "version": "1.0.8",
+  "description": "Login Facebook",
+  "main": "angular-bzfacebook.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tindl88/angular-bzfacebook.git"
+  },
+  "author": "tindl88@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tindl88/angular-bzfacebook/issues"
+  },
+  "homepage": "https://github.com/tindl88/angular-bzfacebook#readme"
+}

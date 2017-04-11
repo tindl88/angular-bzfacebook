@@ -1,7 +1,7 @@
 (function(){
 	'use strict';
 
-	angular
+	module.exports = angular
 	.module('ngFacebook', [])
 	.provider('$facebook', facebookProvider)
 	.run(run);
@@ -219,7 +219,7 @@
 	function run($window, $facebook){
 		$window.fbAsyncInit = function() {
 			$facebook.init();
-			$facebook.getLoginStatus();
+			// $facebook.getLoginStatus();
 		};
 	}
 
