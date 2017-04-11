@@ -1,234 +1,219 @@
-(function(){
-	'use strict';
+/* commonjs package manager support (eg componentjs) */
+if (typeof module !== 'undefined' && typeof exports !== 'undefined' && module.exports === exports) {
+  module.exports = 'ngFacebook'
+}
 
-	module.exports = angular
-	.module('ngFacebook', [])
-	.provider('$facebook', facebookProvider)
-	.run(run);
+(function (window, angular, undefined) {
+  'use strict'
 
-	function facebookProvider(){
-		var config = {
-			language: 'vi_VN',
-			appId: null,
-			cookie: false,
-			xfbml: false,
-			permissions: null,
-			version: 'v2.5',
-			redirect: ''
-		};
+  angular
+    .module('ngFacebook', [])
+    .provider('$facebook', facebookProvider)
+    .run(run)
 
-		this.setLanguage = function(val) {
-			config.language = val;
-		};
+  function facebookProvider () {
+    var config = {
+      language: 'vi_VN',
+      appId: null,
+      cookie: false,
+      xfbml: false,
+      permissions: null,
+      version: 'v2.8',
+      redirect: ''
+    }
 
-		this.setAppId = function(val) {
-			config.appId = val;
-		};
+    this.setLanguage = function (val) {
+      config.language = val
+    }
 
-		this.setPermissions = function(val) {
-			config.permissions = val;
-		};
+    this.setAppId = function (val) {
+      config.appId = val
+    }
 
-		this.setVersion = function(val) {
-			config.version = val;
-		};
+    this.setPermissions = function (val) {
+      config.permissions = val
+    }
 
-		this.setCookie = function(val) {
-			config.cookie = val;
-		};
+    this.setVersion = function (val) {
+      config.version = val
+    }
 
-		this.setXfbml = function(val) {
-			config.xfbml = val;
-		};
+    this.setCookie = function (val) {
+      config.cookie = val
+    }
 
-		this.redirect = function(val) {
-			config.redirect = val;
-		};
+    this.setXfbml = function (val) {
+      config.xfbml = val
+    }
 
-		this.$get = function($q, $window) {
-			var facebook = $q.defer();
+    this.redirect = function (val) {
+      config.redirect = val
+    }
 
-			loadScript();
+    this.$get = function ($q, $window) {
+      var facebook = $q.defer()
 
-			facebook.init = function() {
-				var deferred = $q.defer();
+      loadScript()
 
-				FB.init({
-					appId: config.appId,
-					cookie: config.cookie,
-					xfbml: config.xfbml,
-					version: config.version
-				});
+      facebook.init = function () {
+        var deferred = $q.defer()
 
-				facebook.resolve();
+        FB.init({
+          appId: config.appId,
+          cookie: config.cookie,
+          xfbml: config.xfbml,
+          version: config.version
+        })
 
-				return deferred.promise;
-			};
+        facebook.resolve()
 
-			facebook.getLoginStatus = function(){
-				var deferred = $q.defer();
+        return deferred.promise
+      }
 
-				facebook.promise.then(function(){
-					FB.getLoginStatus(function(response) {
-						deferred.resolve(response);
-					});
-				});
+      facebook.getLoginStatus = function () {
+        var deferred = $q.defer()
 
-				return deferred.promise;
-			};
+        facebook.promise.then(function () {
+          FB.getLoginStatus(function (response) {
+            deferred.resolve(response)
+          })
+        })
 
-			facebook.login = function(){
-				var deferred = $q.defer();
+        return deferred.promise
+      }
 
-				facebook.promise.then(function(){
-					facebook.getLoginStatus().then(function(response){
-						if (response.status === 'connected') {
-							successCallback(response);
-						} else {
-							if(navigator.userAgent.match('CriOS')){
-								if(response.status === 'unknown'){
-									$window.open('https://www.facebook.com/dialog/oauth?client_id='+config.appId+'&redirect_uri='+config.redirect+'&scope='+config.permissions, '', null);
-								} else {
-									errorCallback(null);
-								}
-							} else {
-								FB.login(function(resp) {
-									if (resp.status === 'connected') {
-										successCallback(resp);
-									} else {
-										errorCallback(resp);
-									}
-								}, {scope: config.permissions});
-							}
-						}
-					});
-				});
+      facebook.login = function () {
+        var deferred = $q.defer()
 
-				function successCallback (resp){
-					deferred.resolve(resp);
-				}
+        facebook.promise.then(function () {
+          facebook.getLoginStatus()
+            .then(function (response) {
+              if (response.status === 'connected') {
+                deferred.resolve(response)
+              } else {
+                if (navigator.userAgent.match('CriOS')) {
+                  if (response.status === 'unknown') {
+                    $window.open('https://www.facebook.com/dialog/oauth?client_id=' + config.appId + '&redirect_uri=' + config.redirect + '&scope=' + config.permissions, '', null)
+                  } else {
+                    deferred.resolve(response)
+                  }
+                } else {
+                  FB.login(function (resp) {
+                    deferred.resolve(resp)
+                  }, {scope: config.permissions})
+                }
+              }
+            })
+        })
 
-				function errorCallback (resp){
-					deferred.reject(resp);
-				}
+        return deferred.promise
+      }
 
-				return deferred.promise;
-			};
+      facebook.logout = function () {
+        var deferred = $q.defer()
 
-			facebook.logout = function(){
-				var deferred = $q.defer();
+        facebook.getLoginStatus()
+          .then(function (resp) {
+            if (resp.status === 'connected') {
+              FB.logout(function (response) {
+                deferred.resolve(response)
+              })
+            } else {
+              deferred.resolve(resp)
+            }
+          })
 
-				facebook.getLoginStatus()
-				.then(function(resp){
-					if(resp.status === 'connected'){
-						FB.logout(function(response) {
-							deferred.resolve(response);
-						});
-					} else {
-						deferred.resolve(resp);
-					}
-				});
+        return deferred.promise
+      }
 
-				return deferred.promise;
-			};
+      facebook.ui = function (options) {
+        var deferred = $q.defer()
 
-			facebook.ui = function(options){
-				var deferred = $q.defer();
+        options = extend({
+          method: 'share'
+        }, options)
 
-				options = extend({
-					method: 'share'
-				}, options);
+        facebook.promise.then(function () {
+          FB.ui(options, function (response) {
+            deferred.resolve(response)
+          })
+        })
 
-				facebook.promise.then(function(){
-					FB.ui(options, function(response){
-						if(response){
-							deferred.resolve(response);
-						} else {
-							deferred.reject(response);
-						}
-					});
-				});
+        return deferred.promise
+      }
 
-				return deferred.promise;
-			};
+      facebook.api = function (options) {
+        var deferred = $q.defer()
 
-			facebook.api = function(options){
-				var deferred = $q.defer();
+        options = extend({
+          method: 'get',
+          link: '/me/feed',
+          params: {}
+        }, options)
 
-				options = extend({
-					method: 'get',
-					link: '/me/feed',
-					params: {}
-				}, options);
+        facebook.promise.then(function () {
+          FB.api(options.link, options.method, options.params, function (response) {
+            deferred.resolve(response)
+          })
+        })
 
-				facebook.promise.then(function(){
-					FB.api(options.link, options.method, options.params, function(response) {
-						if (!response || response.error) {
-							deferred.reject(response);
-						} else {
-							deferred.resolve(response);
-						}
-					});
-				});
+        return deferred.promise
+      }
 
-				return deferred.promise;
-			};
+      facebook.parse = function (element, callback) {
+        var deferred = $q.defer()
 
-			facebook.parse = function(element, callback){
-				var deferred = $q.defer();
+        facebook.promise.then(function () {
+          FB.XFBML.parse(element, function () {
+            if (typeof callback === 'function')
+              callback()
+          })
+        })
 
-				facebook.promise.then(function(){
-					FB.XFBML.parse(element, function(){
-						if(typeof callback === 'function')
-							callback();
-					});
-				});
+        deferred.resolve()
 
-				deferred.resolve();
+        return deferred.promise
+      }
 
-				return deferred.promise;
-			};
+      facebook.setCanvasSize = function (element) {
+        var deferred = $q.defer()
 
-			facebook.setCanvasSize = function(element){
-				var deferred = $q.defer();
+        facebook.promise.then(function () {
+          FB.Canvas.setSize({
+            width: 810,
+            height: parseInt(element.innerHeight)
+          })
+        })
 
-				facebook.promise.then(function(){
-					FB.Canvas.setSize({
-						width: 810,
-						height: parseInt(element.innerHeight)
-					});
-				});
+        deferred.resolve()
 
-				deferred.resolve();
+        return deferred.promise
+      }
 
-				return deferred.promise;
-			};
+      function loadScript () {
+        if (document.getElementById('facebookScript')) {return;}
+        var script = document.createElement('script')
+        script.src = '//connect.facebook.net/' + config.language + '/sdk.js'
+        script.id = 'facebookScript'
+        document.body.appendChild(script)
+      }
 
-			function loadScript() {
-				if (document.getElementById('facebookScript')) {return;}
-				var script = document.createElement('script');
-				script.src = '//connect.facebook.net/'+config.language+'/sdk.js';
-				script.id = 'facebookScript';
-				document.body.appendChild(script);
-			}
+      return facebook
+    }
+  }
 
-			return facebook;
-		};
-	}
+  function run ($window, $facebook) {
+    $window.fbAsyncInit = function () {
+      $facebook.init()
+    }
+  }
 
-	function run($window, $facebook){
-		$window.fbAsyncInit = function() {
-			$facebook.init();
-			// $facebook.getLoginStatus();
-		};
-	}
-
-	function extend(a, b){
-		for(var key in b){
-			if(b.hasOwnProperty(key)){
-				a[key] = b[key];
-			}
-		}
-		return a;
-	}
-})();
+  function extend (a, b) {
+    for (var key in b) {
+      if (b.hasOwnProperty(key)) {
+        a[key] = b[key]
+      }
+    }
+    return a
+  }
+})(window, window.angular)
