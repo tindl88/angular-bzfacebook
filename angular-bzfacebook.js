@@ -193,7 +193,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' && module.ex
       function loadScript () {
         if (document.getElementById('facebookScript')) {return;}
         var script = document.createElement('script')
-        script.src = '//connect.facebook.net/' + config.language + '/sdk.js'
+        script.src = 'https://connect.facebook.net/' + config.language + '/sdk.js'
         script.id = 'facebookScript'
         document.body.appendChild(script)
       }
